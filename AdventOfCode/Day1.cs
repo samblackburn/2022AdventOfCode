@@ -5,7 +5,7 @@ public class Tests
     [Test]
     public void Part1_TheMostCalories()
     {
-        var input = File.ReadAllLines("input.txt");
+        var input = File.ReadAllLines("Day1Input.txt");
         var elves = new List<int> {0};
         
         foreach (var line in input)
@@ -28,7 +28,7 @@ public class Tests
     [Test]
     public void Part2_TopThreeElves_TotalCalories()
     {
-        var input = File.ReadAllLines("input.txt");
+        var input = File.ReadAllLines("Day1Input.txt");
         var elves = new List<Elf> {new Elf()};
         
         foreach (var line in input)
