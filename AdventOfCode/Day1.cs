@@ -1,14 +1,9 @@
-namespace ElfStarFruit;
+namespace AdventOfCode;
 
 public class Tests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     [Test]
-    public void Test1()
+    public void Part1_TheMostCalories()
     {
         var input = File.ReadAllLines("input.txt");
         var elves = new List<int> {0};
@@ -31,7 +26,7 @@ public class Tests
     }
     
     [Test]
-    public void Test2()
+    public void Part2_TopThreeElves_TotalCalories()
     {
         var input = File.ReadAllLines("input.txt");
         var elves = new List<Elf> {new Elf()};
