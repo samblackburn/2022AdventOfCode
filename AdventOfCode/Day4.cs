@@ -14,8 +14,11 @@ public class Day4
     private bool OneRangeFullyContainsTheOther(string line)
     {
         var parts = line.Split(',', '-').Select(int.Parse).ToArray();
-        var firstContainsSecond = parts[0] >= parts[3] && parts[2] <= parts[4];
-        var secondContainsFirst = parts[0] <= parts[3] && parts[2] >= parts[4];
+        var firstContainsSecond = parts[0] <= parts[2] && parts[1] >= parts[3];
+        var secondContainsFirst = parts[0] >= parts[2] && parts[1] <= parts[3];
+        //if (firstContainsSecond) Console.WriteLine($"{parts[0]}-{parts[1]} contains {parts[2]}-{parts[3]}");
+        //if (secondContainsFirst) Console.WriteLine($"{parts[0]}-{parts[1]} is contained in {parts[2]}-{parts[3]}");
+        
         return firstContainsSecond || secondContainsFirst;
     }
 }
