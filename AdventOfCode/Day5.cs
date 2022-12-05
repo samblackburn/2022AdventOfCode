@@ -6,14 +6,60 @@ public class Day5
     [Test]
     public void Part1()
     {
+        var stacks = ParseInput(out var moves);
+
+        Drawify(stacks);
+        
+        foreach (var move in moves)
+        {
+            for (var step = 0; step < move.HowMany; step++)
+            {
+                var crate = stacks[move.From].Pop();
+                //Console.WriteLine($"Move {crate} from {move.From} to {move.To}");
+                stacks[move.To].Push(crate);
+            }
+        }
+
+        Drawify(stacks);
+    }
+    
+    [Test]
+    public void Part2()
+    {
+        var stacks = ParseInput(out var moves);
+
+        Drawify(stacks);
+        
+        foreach (var move in moves)
+        {
+            var toMove = new Stack<char>();
+            
+            for (var step = 0; step < move.HowMany; step++)
+            {
+                var crate = stacks[move.From].Pop();
+                toMove.Push(crate);
+            }
+            
+            for (var step = 0; step < move.HowMany; step++)
+            {
+                var crate = toMove.Pop();
+                stacks[move.To].Push(crate);
+            }
+        }
+
+        Drawify(stacks);
+    }
+
+    private static Stack<char>[] ParseInput(out List<Move> moves)
+    {
         var lines = File.ReadAllLines("Day5Input.txt");
         var stacks = new Stack<char>[11];
         for (int i = 0; i < stacks.Length; i++)
         {
             stacks[i] = new Stack<char>();
         }
-        
-        var moves = new List<Move>();
+
+        moves = new List<Move>();
 
         foreach (var line in lines.Reverse())
         {
@@ -32,25 +78,12 @@ public class Day5
                 var from = parts[3];
                 var to = parts[5];
 
-                moves.Add(new Move {HowMany = int.Parse(howMany), From = int.Parse(from), To = int.Parse(to)});
+                moves.Add(new Move {HowMany = int.Parse(howMany), From = int.Parse(@from), To = int.Parse(to)});
             }
         }
 
         moves.Reverse();
-        
-        Drawify(stacks);
-        
-        foreach (var move in moves)
-        {
-            for (var step = 0; step < move.HowMany; step++)
-            {
-                var crate = stacks[move.From].Pop();
-                //Console.WriteLine($"Move {crate} from {move.From} to {move.To}");
-                stacks[move.To].Push(crate);
-            }
-        }
-
-        Drawify(stacks);
+        return stacks;
     }
 
     private static void Drawify(IEnumerable<Stack<char>> stacks)
