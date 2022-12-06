@@ -9,6 +9,11 @@ public class Day6
     [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 4, ExpectedResult = 10)]
     [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 4, ExpectedResult = 11)]
     [TestCase("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 4, ExpectedResult = -1)]
+    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 14, ExpectedResult = 19)]
+    [TestCase("bvwbjplbgvbhsrlpgdmjqwftvncz", 14, ExpectedResult = 23)]
+    [TestCase("nppdvjthqldpwncqszvftbrmjlhg", 14, ExpectedResult = 23)]
+    [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 14, ExpectedResult = 29)]
+    [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 14, ExpectedResult = 26)]
     public int FindNonRepeatingCharacters(string input, int length)
     {
         for (var i = 0; i < input.Length - length; i++)
@@ -22,5 +27,7 @@ public class Day6
 
     [Test]
     public void Part1() => Console.WriteLine(FindNonRepeatingCharacters(File.ReadAllText("Day6Input.txt"), 4));
-
+    
+    [Test]
+    public void Part2() => Console.WriteLine(FindNonRepeatingCharacters(File.ReadAllText("Day6Input.txt"), 14));
 }
