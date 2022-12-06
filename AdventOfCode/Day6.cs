@@ -3,24 +3,24 @@
 [TestFixture]
 public class Day6
 {
-    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", ExpectedResult = 7)]
-    [TestCase("bvwbjplbgvbhsrlpgdmjqwftvncz", ExpectedResult = 5)]
-    [TestCase("nppdvjthqldpwncqszvftbrmjlhg", ExpectedResult = 6)]
-    [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", ExpectedResult = 10)]
-    [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", ExpectedResult = 11)]
-    [TestCase("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", ExpectedResult = -1)]
-    public int Part1(string input)
+    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 4, ExpectedResult = 7)]
+    [TestCase("bvwbjplbgvbhsrlpgdmjqwftvncz", 4, ExpectedResult = 5)]
+    [TestCase("nppdvjthqldpwncqszvftbrmjlhg", 4, ExpectedResult = 6)]
+    [TestCase("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 4, ExpectedResult = 10)]
+    [TestCase("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 4, ExpectedResult = 11)]
+    [TestCase("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 4, ExpectedResult = -1)]
+    public int FindNonRepeatingCharacters(string input, int length)
     {
-        for (var i = 0; i < input.Length - 4; i++)
+        for (var i = 0; i < input.Length - length; i++)
         {
-            var numUniq = input.Substring(i, 4).ToHashSet().Count;
-            if (numUniq == 4) return i + 4;
+            var numUniq = input.Substring(i, length).ToHashSet().Count;
+            if (numUniq == length) return i + length;
         }
 
         return -1;
     }
 
     [Test]
-    public void Part1Actual() => Console.WriteLine(Part1(File.ReadAllText("Day6Input.txt")));
+    public void Part1() => Console.WriteLine(FindNonRepeatingCharacters(File.ReadAllText("Day6Input.txt"), 4));
 
 }
