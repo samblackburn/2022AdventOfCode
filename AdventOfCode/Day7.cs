@@ -51,24 +51,26 @@ $ ls
 
         foreach (var kvp in m_FileSizes)
         {
-            Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
+            //Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
         }
 
-        var allDirs = m_FileSizes.GroupBy(f => Parent(f.Key));
+        var allDirs = m_FileSizes
+            .GroupBy(f => Parent(f.Key))
+            .Select(g => g.Key)
+            .ToArray();
+        var total = 0L;
         foreach (var dir in allDirs)
         {
-            if (SizeWithDescendants(dir.Key) > 100000) continue;
-            Console.WriteLine($"Dir {dir.Key} is of size {SizeWithDescendants(dir.Key)}");
+            var size = SizeWithDescendents(dir);
+            if (size > 100_000L) continue;
+            total += size;
+            Console.WriteLine($"Folder {dir} is of size {size}");
         }
         
-        var result = allDirs.Select(g => SizeWithDescendants(g.Key))
-            .Where(s => s <= 100000)
-            .Sum();
-        
-        Console.WriteLine(result);
+        Console.WriteLine(total);
     }
 
-    private long SizeWithDescendants(string dir)
+    private long SizeWithDescendents(string dir)
     {
         return m_FileSizes
             .Where(kvp => kvp.Key.StartsWith(dir + '/'))
@@ -111,7 +113,17 @@ $ ls
                     throw new Exception("Unexpected command " + line);
                 }
 
+                if (line.Split(" ").Length != 3)
+                {
+                    throw new Exception("Wrong number of parts: " + line);
+                }
+                
                 var subDir = line.Split(" ")[2];
+                if (subDir.Contains('/'))
+                {
+                    throw new Exception($"Could not parse: {line}");
+                }
+
                 m_Path = m_Path + "/" + subDir;
                 
                 break;
@@ -119,5 +131,12 @@ $ ls
         }
     }
 
-    private static string Parent(string path) => string.Join("/", path.Split("/").SkipLast(1));
+    [TestCase("/a/b/c", ExpectedResult = "/a/b")]
+    [TestCase("a/b/c", ExpectedResult = "a/b")]
+    [TestCase("a/b/b/c", ExpectedResult = "a/b/b")]
+    public static string Parent(string path)
+    {
+        if (path.EndsWith("/")) throw new Exception("Path " + path + " should not end with /");
+        return string.Join("/", path.Split("/").SkipLast(1));
+    }
 }
