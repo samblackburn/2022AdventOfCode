@@ -26,30 +26,14 @@ R 2".Split(Environment.NewLine);
 
         foreach (var line in input)
         {
-            var direction = line.Split(" ")[0] switch
-            {
-                "U"=> Up,
-                "D"=> Down,
-                "L"=> Left,
-                "R"=> Right,
-                _ => throw new Exception("Unknown direction for " + line)
-            };
             var magnitude = int.Parse(line.Split(" ")[1]);
             for (var i = 0; i < magnitude; i++)
             {
-                headPosition += direction;
-                //if (headPosition.X - tailPosition.X == 2) tailPosition += Right;
-                //if (headPosition.X - tailPosition.X == -2) tailPosition += Left;
-                //if (headPosition.Y - tailPosition.Y == 2) tailPosition += Down;
-                //if (headPosition.Y - tailPosition.Y == -2) tailPosition += Up;
+                headPosition += Direction(line);
                 var tailVector = headPosition - tailPosition;
                 if (tailVector.Magnitude > 1.5d)
                 {
-                    if (tailVector.X > 1) { tailVector -= Right; }
-                    if (tailVector.X < -1) { tailVector -= Left; }
-                    if (tailVector.Y > 1) { tailVector -= Down; }
-                    if (tailVector.Y < -1) { tailVector -= Up; }
-                    tailPosition += tailVector;
+                    tailPosition += Clamp(tailVector);
                 }
 
                 tailPositions.Add(tailPosition);
@@ -59,6 +43,43 @@ R 2".Split(Environment.NewLine);
         }
         
         Console.WriteLine(tailPositions.Count);
+    }
+
+    private Point Clamp(Point tailVector)
+    {
+        if (tailVector.X > 1)
+        {
+            tailVector -= Right;
+        }
+
+        if (tailVector.X < -1)
+        {
+            tailVector -= Left;
+        }
+
+        if (tailVector.Y > 1)
+        {
+            tailVector -= Down;
+        }
+
+        if (tailVector.Y < -1)
+        {
+            tailVector -= Up;
+        }
+
+        return tailVector;
+    }
+
+    private Point Direction(string line)
+    {
+        return line.Split(" ")[0] switch
+        {
+            "U"=> Up,
+            "D"=> Down,
+            "L"=> Left,
+            "R"=> Right,
+            _ => throw new Exception("Unknown direction for " + line)
+        };
     }
 
     private record Point(int X, int Y)
