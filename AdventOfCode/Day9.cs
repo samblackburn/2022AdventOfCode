@@ -44,6 +44,55 @@ R 2".Split(Environment.NewLine);
         
         Console.WriteLine(tailPositions.Count);
     }
+    
+    [Test]
+    public void Part2()
+    {
+        var input = @"R 4
+U 4
+L 3
+D 1
+R 4
+D 1
+L 5
+R 2".Split(Environment.NewLine);
+        input = @"R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20".Split(Environment.NewLine);
+        input = File.ReadAllLines("Day9Input.txt");
+
+        var rope = Enumerable.Range(0, 10).Select(_ => new Point(0, 0)).ToArray();
+        var tailPositions = new HashSet<Point> {rope.Last()};
+
+        foreach (var line in input)
+        {
+            var magnitude = int.Parse(line.Split(" ")[1]);
+            for (var i = 0; i < magnitude; i++)
+            {
+                rope[0] += Direction(line);
+                for (int s = 1; s < rope.Length; s++)
+                {
+                    var delta = rope[s-1] - rope[s];
+                    if (delta.Magnitude > 1.5d)
+                    {
+                        rope[s] += Clamp(delta);
+                    }
+                }
+
+                tailPositions.Add(rope.Last());
+                
+                //Console.WriteLine($"{line} {headPosition} {tailPosition}");
+            }
+        }
+        
+        Console.WriteLine(string.Join("; ", rope.Select((x, i) => $"{i}: {x}")));
+        Console.WriteLine(tailPositions.Count);
+    }
 
     private Point Clamp(Point tailVector)
     {
