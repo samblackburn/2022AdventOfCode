@@ -36,6 +36,18 @@ $ ls
 5626152 d.ext
 7214296 k".Split(Environment.NewLine)
         }) {ExpectedResult = 95437, TestName = "Example input"},
+        new TestCaseData(new object[]
+        {
+            @"$ cd /
+$ ls
+dir a
+$ cd a
+$ ls
+dir b
+$ cd b
+$ ls
+584 c.txt".Split(Environment.NewLine)
+        }) {ExpectedResult = 584 * 2, TestName = "A folder that only contains a subfolder"},
     };
 
     [TestCaseSource(nameof(Day7Inputs))]
