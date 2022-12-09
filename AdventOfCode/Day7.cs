@@ -9,8 +9,29 @@ public class Day7
     [Test]
     public void Part1()
     {
+        ParseInput();
+
+        foreach (var kvp in m_DirectorySizes)
+        {
+            //Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
+        }
+
+        var total = 0L;
+        foreach (var dir in m_DirectorySizes)
+        {
+            var size = SizeWithDescendents(dir.Key);
+            if (size > 100_000L) continue;
+            total += size;
+            Console.WriteLine($"Folder {dir.Key} is of size {size}");
+        }
+        
+        Console.WriteLine(total);
+    }
+
+    private void ParseInput()
+    {
         m_Path = ":";
-        m_DirectorySizes = new Dictionary<string, long>{{":", 0}};
+        m_DirectorySizes = new Dictionary<string, long> {{":", 0}};
         var lines = @"$ cd /
 $ ls
 dir a
@@ -34,7 +55,7 @@ $ ls
 8033020 d.log
 5626152 d.ext
 7214296 k".Split(Environment.NewLine);
-        
+
         lines = File.ReadAllLines("Day7Input.txt");
 
         foreach (var line in lines)
@@ -48,22 +69,6 @@ $ ls
                 ProcessCommandOutput(line);
             }
         }
-
-        foreach (var kvp in m_DirectorySizes)
-        {
-            //Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
-        }
-
-        var total = 0L;
-        foreach (var dir in m_DirectorySizes)
-        {
-            var size = SizeWithDescendents(dir.Key);
-            if (size > 100_000L) continue;
-            total += size;
-            Console.WriteLine($"Folder {dir.Key} is of size {size}");
-        }
-        
-        Console.WriteLine(total);
     }
 
     private long SizeWithDescendents(string dir)
