@@ -4,13 +4,13 @@
 public class Day7
 {
     private string m_Path;
-    private IDictionary<string, long> m_FileSizes;
+    private IDictionary<string, long> m_DirectorySizes;
 
     [Test]
     public void Part1()
     {
         m_Path = ":";
-        m_FileSizes = new Dictionary<string, long>();
+        m_DirectorySizes = new Dictionary<string, long>{{":", 0}};
         var lines = @"$ cd /
 $ ls
 dir a
@@ -49,22 +49,18 @@ $ ls
             }
         }
 
-        foreach (var kvp in m_FileSizes)
+        foreach (var kvp in m_DirectorySizes)
         {
             //Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
         }
 
-        var allDirs = m_FileSizes
-            .GroupBy(f => Parent(f.Key))
-            .Select(g => g.Key)
-            .ToArray();
         var total = 0L;
-        foreach (var dir in allDirs)
+        foreach (var dir in m_DirectorySizes)
         {
-            var size = SizeWithDescendents(dir);
+            var size = SizeWithDescendents(dir.Key);
             if (size > 100_000L) continue;
             total += size;
-            Console.WriteLine($"Folder {dir} is of size {size}");
+            Console.WriteLine($"Folder {dir.Key} is of size {size}");
         }
         
         Console.WriteLine(total);
@@ -72,8 +68,8 @@ $ ls
 
     private long SizeWithDescendents(string dir)
     {
-        return m_FileSizes
-            .Where(kvp => kvp.Key.StartsWith(dir + '/'))
+        return m_DirectorySizes
+            .Where(kvp => kvp.Key.StartsWith(dir))
             .Sum(kvp => kvp.Value);
     }
 
@@ -82,7 +78,7 @@ $ ls
         var parts = line.Split(" ");
         if (parts[0] == "dir")
         {
-            
+            m_DirectorySizes.Add(m_Path + "/" + parts[1], 0);
         }
         else if (!long.TryParse(parts[0], out var size))
         {
@@ -90,7 +86,7 @@ $ ls
         }
         else
         {
-            m_FileSizes.Add(m_Path + "/" + parts[1], size);
+            m_DirectorySizes[m_Path] += size;
         }
     }
 
