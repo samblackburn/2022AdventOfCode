@@ -3,16 +3,7 @@
 [TestFixture]
 public class Day7
 {
-    private string m_Path;
-    private IDictionary<string, long> m_DirectorySizes;
-
-    private static IEnumerable<TestCaseData> Day7Inputs => new[]
-    {
-        new TestCaseData(new object[] {File.ReadAllLines("Day7Input.txt")})
-            {ExpectedResult = 1501149, TestName = "Day 7 input"},
-        new TestCaseData(new object[]
-        {
-            @"$ cd /
+    private const string c_SampleInput = @"$ cd /
 $ ls
 dir a
 14848514 b.txt
@@ -34,11 +25,12 @@ $ ls
 4060174 j
 8033020 d.log
 5626152 d.ext
-7214296 k".Split(Environment.NewLine)
-        }) {ExpectedResult = 95437, TestName = "Example input"},
-        new TestCaseData(new object[]
-        {
-            @"$ cd /
+7214296 k";
+
+    private string m_Path;
+    private IDictionary<string, long> m_DirectorySizes;
+
+    private static string c_NestedInput = @"$ cd /
 $ ls
 dir a
 $ cd a
@@ -46,8 +38,16 @@ $ ls
 dir b
 $ cd b
 $ ls
-584 c.txt".Split(Environment.NewLine)
-        }) {ExpectedResult = 584 * 3, TestName = "A folder that only contains a subfolder"},
+584 c.txt";
+
+    private static IEnumerable<TestCaseData> Day7Inputs => new[]
+    {
+        new TestCaseData(new object[] {File.ReadAllLines("Day7Input.txt")})
+            {ExpectedResult = 1501149, TestName = "Day 7 input"},
+        new TestCaseData(new object[] {c_SampleInput.Split(Environment.NewLine)})
+            {ExpectedResult = 95437, TestName = "Example input"},
+        new TestCaseData(new object[] {c_NestedInput.Split(Environment.NewLine)})
+            {ExpectedResult = 584 * 3, TestName = "A folder that only contains a subfolder"},
     };
 
     private void ParseInput(string[] lines)
