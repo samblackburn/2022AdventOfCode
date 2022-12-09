@@ -6,12 +6,13 @@ public class Day7
     private string m_Path;
     private IDictionary<string, long> m_FileSizes;
 
-    [Test]
-    public void Part1()
+    private static IEnumerable<TestCaseData> Day7Inputs => new[]
     {
-        m_Path = ":";
-        m_FileSizes = new Dictionary<string, long>();
-        var lines = @"$ cd /
+        new TestCaseData(new object[] {File.ReadAllLines("Day7Input.txt")})
+            {ExpectedResult = 1331842, TestName = "Day 7 input"},
+        new TestCaseData(new object[]
+        {
+            @"$ cd /
 $ ls
 dir a
 14848514 b.txt
@@ -33,9 +34,15 @@ $ ls
 4060174 j
 8033020 d.log
 5626152 d.ext
-7214296 k".Split(Environment.NewLine);
-        
-        lines = File.ReadAllLines("Day7Input.txt");
+7214296 k".Split(Environment.NewLine)
+        }) {ExpectedResult = 95437, TestName = "Example input"},
+    };
+
+    [TestCaseSource(nameof(Day7Inputs))]
+    public long Part1(string[] lines)
+    {
+        m_Path = ":";
+        m_FileSizes = new Dictionary<string, long>();
 
         foreach (var line in lines)
         {
@@ -68,6 +75,7 @@ $ ls
         }
         
         Console.WriteLine(total);
+        return total;
     }
 
     private long SizeWithDescendents(string dir)
