@@ -28,6 +28,23 @@ public class Day7
         Console.WriteLine(total);
     }
 
+    [Test]
+    public void Part2()
+    {
+        ParseInput();
+
+        var totalCapacity = 70000000;
+        var needAvailable = 30000000;
+        var currentlyUsed = m_DirectorySizes.Sum(x => x.Value);
+        Console.WriteLine("Used: " + currentlyUsed);
+        var needToFree = needAvailable - (totalCapacity - currentlyUsed);
+        Console.WriteLine("Need to free: " + needToFree);
+        
+        var smallest = m_DirectorySizes.Select(x => SizeWithDescendents(x.Key)).OrderBy(x => x).First(x => x > needToFree);
+        
+        Console.WriteLine(smallest);
+    }
+
     private void ParseInput()
     {
         m_Path = ":";
