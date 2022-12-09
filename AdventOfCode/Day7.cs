@@ -50,8 +50,7 @@ $ ls
         }) {ExpectedResult = 584 * 3, TestName = "A folder that only contains a subfolder"},
     };
 
-    [TestCaseSource(nameof(Day7Inputs))]
-    public long Part1(string[] lines)
+    private void ParseInput(string[] lines)
     {
         m_Path = ":";
         m_DirectorySizes = new Dictionary<string, long> {{":", 0}};
@@ -67,12 +66,13 @@ $ ls
                 ProcessCommandOutput(line);
             }
         }
+    }
 
-        foreach (var kvp in m_DirectorySizes)
-        {
-            //Console.WriteLine($"{kvp.Key} is of size {kvp.Value}");
-        }
-
+    [TestCaseSource(nameof(Day7Inputs))]
+    public long Part1(string[] lines)
+    {
+        ParseInput(lines);
+        
         var total = 0L;
         foreach (var dir in m_DirectorySizes)
         {
@@ -81,7 +81,7 @@ $ ls
             total += size;
             Console.WriteLine($"Folder {dir.Key} is of size {size}");
         }
-        
+
         Console.WriteLine(total);
         return total;
     }
