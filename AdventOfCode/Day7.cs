@@ -40,7 +40,7 @@ $ cd b
 $ ls
 584 c.txt";
 
-    private static IEnumerable<TestCaseData> Day7Inputs => new[]
+    private static IEnumerable<TestCaseData> Day7Part1 => new[]
     {
         new TestCaseData(new object[] {File.ReadAllLines("Day7Input.txt")})
             {ExpectedResult = 1501149, TestName = "Day 7 input"},
@@ -48,6 +48,16 @@ $ ls
             {ExpectedResult = 95437, TestName = "Example input"},
         new TestCaseData(new object[] {c_NestedInput.Split(Environment.NewLine)})
             {ExpectedResult = 584 * 3, TestName = "A folder that only contains a subfolder"},
+    };
+    
+    private static IEnumerable<TestCaseData> Day7Part2 => new[]
+    {
+        new TestCaseData(new object[] {File.ReadAllLines("Day7Input.txt")})
+            {ExpectedResult = 10096985, TestName = "Day 7 input"},
+        new TestCaseData(new object[] {c_SampleInput.Split(Environment.NewLine)})
+            {ExpectedResult = 24933642, TestName = "Example input"},
+        new TestCaseData(new object[] {c_NestedInput.Split(Environment.NewLine)})
+            {ExpectedResult = 584, TestName = "A folder that only contains a subfolder"},
     };
 
     private void ParseInput(string[] lines)
@@ -68,7 +78,7 @@ $ ls
         }
     }
 
-    [TestCaseSource(nameof(Day7Inputs))]
+    [TestCaseSource(nameof(Day7Part1))]
     public long Part1(string[] lines)
     {
         ParseInput(lines);
@@ -84,6 +94,24 @@ $ ls
 
         Console.WriteLine(total);
         return total;
+    }
+    
+    [TestCaseSource(nameof(Day7Part2))]
+    public long Part2(string[] lines)
+    {
+        ParseInput(lines);
+
+        var totalCapacity = 70000000;
+        var needAvailable = 30000000;
+        var currentlyUsed = m_DirectorySizes.Sum(x => x.Value);
+        Console.WriteLine("Used: " + currentlyUsed);
+        var needToFree = needAvailable - (totalCapacity - currentlyUsed);
+        Console.WriteLine("Need to free: " + needToFree);
+        
+        var smallest = m_DirectorySizes.Select(x => SizeWithDescendents(x.Key)).OrderBy(x => x).First(x => x > needToFree);
+        
+        Console.WriteLine(smallest);
+        return smallest;
     }
 
     private long SizeWithDescendents(string dir)
