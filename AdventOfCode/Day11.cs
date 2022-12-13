@@ -7,7 +7,21 @@ public class Day11
     {
         var monkeys = Parse(file);
 
-        DoRound(monkeys);
+        for (var round = 0; round < 20; round++)
+        {
+            DoRound(monkeys);
+            
+            Console.WriteLine("Round " + round);
+            foreach (var monkey in monkeys)
+            {
+                Console.WriteLine(String.Join(", ", monkey.StartingItems));
+            }
+        }
+
+        var inspected = monkeys.Select(m => m.ItemsInspected).OrderByDescending(x => x).ToArray();
+        
+        Console.WriteLine(string.Join(", ", inspected));
+        Console.WriteLine(inspected[0] * inspected[1]);
     }
 
     private void DoRound(List<MonkeyBehaviour> monkeyBehaviours)
@@ -16,10 +30,11 @@ public class Day11
         {
             foreach (var item in monkey.StartingItems)
             {
+                monkey.ItemsInspected++;
                 var newWorryLevel = monkey.Operation(item) / 3;
                 var recipient = newWorryLevel / monkey.Modulus == 0 ? monkey.IfTrue : monkey.IfFalse;
                 monkeyBehaviours[recipient].StartingItems.Add(newWorryLevel);
-                Console.WriteLine($"{item} becomes a {newWorryLevel} and is thrown to {recipient}");
+                //Console.WriteLine($"{item} becomes a {newWorryLevel} and is thrown to {recipient}");
             }
             
             monkey.StartingItems.Clear();
@@ -97,6 +112,7 @@ public class Day11
 
     private class MonkeyBehaviour
     {
+        public int ItemsInspected;
         public List<int> StartingItems;
         public Func<int, int> Operation;
         public int Modulus;
