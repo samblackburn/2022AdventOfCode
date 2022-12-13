@@ -3,8 +3,8 @@
 public class Day11
 {
     [TestCase("Day11ExampleInput.yml", ExpectedResult = 10605)]
-    [TestCase("Day11Input.yml", ExpectedResult = 59033)]
-    public int Part1(string file)
+    [TestCase("Day11Input.yml", ExpectedResult = 58786)]
+    public long Part1(string file)
     {
         var monkeys = Parse(file);
 
@@ -59,7 +59,7 @@ public class Day11
                     monkeys.Add(new MonkeyBehaviour{MonkeyId = int.Parse(allWords[1].TrimEnd(':'))});
                     break;
                 case "Starting":
-                    monkeys.Last().StartingItems = afterColon.Split(",").Select(int.Parse).ToList();
+                    monkeys.Last().StartingItems = afterColon.Split(",").Select(long.Parse).ToList();
                     break;
                 case "Operation:":
                     Assert.That(latterWords[0], Is.EqualTo("new"));
@@ -77,7 +77,7 @@ public class Day11
                     }
                     else
                     {
-                        var constant = int.Parse(latterWords[4]);
+                        var constant = long.Parse(latterWords[4]);
                         monkeys.Last().Operation = latterWords[3] switch
                         {
                             "+" => x => x + constant,
@@ -117,8 +117,8 @@ public class Day11
     {
         public int MonkeyId;
         public int ItemsInspected;
-        public List<int> StartingItems;
-        public Func<int, int> Operation;
+        public List<long> StartingItems;
+        public Func<long, long> Operation;
         public int Modulus;
         public int IfTrue;
         public int IfFalse;
