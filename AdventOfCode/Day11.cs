@@ -2,8 +2,9 @@
 
 public class Day11
 {
-    [TestCase("Day11ExampleInput.yml")]
-    public void Part1(string file)
+    [TestCase("Day11ExampleInput.yml", ExpectedResult = 10605)]
+    [TestCase("Day11Input.yml", ExpectedResult = 59033)]
+    public int Part1(string file)
     {
         var monkeys = Parse(file);
 
@@ -20,8 +21,10 @@ public class Day11
 
         var inspected = monkeys.Select(m => m.ItemsInspected).OrderByDescending(x => x).ToArray();
         
-        Console.WriteLine(string.Join(", ", inspected));
-        Console.WriteLine(inspected[0] * inspected[1]);
+        Console.WriteLine("Inspections performed by each monkey: " + string.Join(", ", inspected));
+        var product = inspected[0] * inspected[1];
+        Console.WriteLine("Product of top 2 monkeys: " + product);
+        return product;
     }
 
     private void DoRound(List<MonkeyBehaviour> monkeyBehaviours)
@@ -32,9 +35,9 @@ public class Day11
             {
                 monkey.ItemsInspected++;
                 var newWorryLevel = monkey.Operation(item) / 3;
-                var recipient = newWorryLevel / monkey.Modulus == 0 ? monkey.IfTrue : monkey.IfFalse;
+                var recipient = newWorryLevel % monkey.Modulus == 0 ? monkey.IfTrue : monkey.IfFalse;
                 monkeyBehaviours[recipient].StartingItems.Add(newWorryLevel);
-                //Console.WriteLine($"{item} becomes a {newWorryLevel} and is thrown to {recipient}");
+                //Console.WriteLine($"{monkey.MonkeyId} inspects {item} => {newWorryLevel}, remainder {newWorryLevel / monkey.Modulus}, throws to {recipient}");
             }
             
             monkey.StartingItems.Clear();
@@ -53,7 +56,7 @@ public class Day11
             switch (allWords[0])
             {
                 case "Monkey":
-                    monkeys.Add(new MonkeyBehaviour());
+                    monkeys.Add(new MonkeyBehaviour{MonkeyId = int.Parse(allWords[1].TrimEnd(':'))});
                     break;
                 case "Starting":
                     monkeys.Last().StartingItems = afterColon.Split(",").Select(int.Parse).ToList();
@@ -112,6 +115,7 @@ public class Day11
 
     private class MonkeyBehaviour
     {
+        public int MonkeyId;
         public int ItemsInspected;
         public List<int> StartingItems;
         public Func<int, int> Operation;
