@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using System.Numerics;
+
+namespace AdventOfCode;
 
 public class Day11
 {
@@ -41,6 +43,64 @@ public class Day11
             }
             
             monkey.StartingItems.Clear();
+        }
+    }
+
+    [TestCase("Day11ExampleInput.yml", ExpectedResult = 2713310158L)]
+    [TestCase("Day11Input.yml", ExpectedResult = 14952185856)]
+    public long Part2(string file)
+    {
+        checked
+        {
+            var monkeys = Parse(file);
+
+            for (var round = 0; round < 10000; round++)
+            {
+                DoRoundPart2(monkeys);
+
+                switch (round)
+                {
+                    case 0: case 19:
+                    case 999: case 1999: case 2999: case 3999: case 4999:
+                    case 5999: case 6999: case 7999: case 8999: case 9999:
+                        Console.WriteLine("Round " + round);
+                        foreach (var monkey in monkeys)
+                        {
+                            Console.WriteLine($"Monkey {monkey.MonkeyId} inspected items {monkey.ItemsInspected} times, now has {String.Join(", ", monkey.StartingItems)}");
+                        }
+
+                        break;
+                }
+            }
+
+            var inspected = monkeys.Select(m => m.ItemsInspected).OrderByDescending(x => x).ToArray();
+
+            Console.WriteLine("Inspections performed by each monkey: " + string.Join(", ", inspected));
+            var product = (long) inspected[0] * inspected[1];
+            Console.WriteLine("Product of top 2 monkeys: " + product);
+            return product;
+        }
+    }
+    
+    private void DoRoundPart2(List<MonkeyBehaviour> monkeyBehaviours)
+    {
+        checked
+        {
+            var productOfAllModuli = monkeyBehaviours.Select(m => m.Modulus).Aggregate((m, a) => m * a);
+            
+            foreach (var monkey in monkeyBehaviours)
+            {
+                foreach (var item in monkey.StartingItems)
+                {
+                    monkey.ItemsInspected++;
+                    var newWorryLevel = monkey.Operation(item) % productOfAllModuli;
+                    var recipient = newWorryLevel % monkey.Modulus == 0 ? monkey.IfTrue : monkey.IfFalse;
+                    monkeyBehaviours[recipient].StartingItems.Add(newWorryLevel);
+                    //Console.WriteLine($"{monkey.MonkeyId} inspects {item} => {newWorryLevel}, remainder {newWorryLevel / monkey.Modulus}, throws to {recipient}");
+                }
+
+                monkey.StartingItems.Clear();
+            }
         }
     }
 
