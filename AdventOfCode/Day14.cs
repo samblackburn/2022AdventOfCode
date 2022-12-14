@@ -24,9 +24,35 @@ public class Day14
         Console.WriteLine("Total grains: " + (grains - 1));
         return grains - 1;
     }
+    
+    [TestCase(@"498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9", ExpectedResult = 93, TestName = "Example input")]
+    [TestCase(null, ExpectedResult = 27936, TestName = "Challenge input")]
+    public int Part2(string? inputStr)
+    {
+        var grid = ConstructGrid(inputStr, out var translatedSource);
+        var floor = grid.GetLength(1) - 1;
+        for (var x = 0; x < grid.GetLength(0); x++)
+        {
+            grid[x, floor] = Cell.Floor;
+        }
+
+        bool itFellOut;
+        var grains = 0;
+        do
+        {
+            itFellOut = DropOneGrain(grid, translatedSource);
+            ++grains;
+        } while (!itFellOut);
+        
+        Draw(grid);
+        Console.WriteLine("Total grains: " + (grains - 1));
+        return grains;
+    }
 
     private Cell[,] ConstructGrid(string? inputStr, out Point translatedSource)
     {
+        const int heightAboveFloor = 2;
         var input = (inputStr ?? File.ReadAllText("Day14Input.txt"))
             .Split(Environment.NewLine)
             .Select(line => line
@@ -42,9 +68,9 @@ public class Day14
 
         var top = source.Y;
         var bottom = input.Max(wiggle => wiggle.Max(c => c.Y));
-        var left = input.Min(wiggle => wiggle.Min(c => c.X)) - 1;
-        var right = input.Max(wiggle => wiggle.Max(c => c.X)) + 1;
-        var height = bottom - top + 1;
+        var height = bottom - top + 1 + heightAboveFloor;
+        var left = source.X - height;
+        var right = source.X + height;
         var width = right - left + 1;
         
         translatedSource = new Point(source.X - left, source.Y - top);
@@ -77,15 +103,23 @@ public class Day14
         do
         {
             var newPosition = LetGrainFall(grid, source);
+            
+            if (newPosition.Y == 0)
+            {
+                // It got stuck at the source!
+                return true;
+            }
             if (newPosition == source)
             {
                 grid[newPosition.X, newPosition.Y] = Cell.Sand;
+                // It settled
                 return false;
             }
 
             source = newPosition;
         } while (source.Y < grid.GetLength(1) - 1);
 
+        // It fell out
         return true;
     }
 
@@ -110,6 +144,7 @@ public class Day14
                     Cell.Rock => '#',
                     Cell.Sand => 'o',
                     Cell.Source => '+',
+                    Cell.Floor => '=',
                 });
             }
 
@@ -132,5 +167,6 @@ public class Day14
         Rock = 1,
         Sand = 2,
         Source = 3,
+        Floor = 4,
     }
 }
