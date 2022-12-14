@@ -2,12 +2,14 @@
 
 public class Day12
 {
-    [TestCase(@"Sabqponm
+    [TestCase(
+@"Sabqponm
 abcryxxl
 accszExk
 acctuvwj
-abdefghi", ExpectedResult = 31)]
-    [TestCase(@"abaaacccccccccaaaaaaccccccccccccccccaacccccccccccaacaaaaaaaaaaaaaaaaaccaaaaacccaaaaccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaa
+abdefghi", ExpectedResult = 31, TestName = "Example input")]
+    [TestCase(
+@"abaaacccccccccaaaaaaccccccccccccccccaacccccccccccaacaaaaaaaaaaaaaaaaaccaaaaacccaaaaccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaa
 abaaacccccccccaaaaaacccccccccccccccaaaaccccccccccaaaaaaaacaaaaaaaaaaaccaaaaaaccaaaacccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaaa
 abaaaccccccccccaaaaacccccccccccccccaaaacccccccccccaaaaacccaaaaaaaaaacccaaaaaacccaaccccccccccccccaaaaacccccccccccccccccccccccccccccccccccccaaaaaa
 abccccaaccccccaaaaacccccccccaaaaaccaaaaccccccccccccaaaaacaaaaaaaaacccccaaaaaccccccccccccccccccccaaaaacccccccccccccccccaaaccccaaaccccccccccaaacaa
@@ -48,16 +50,15 @@ abaaacccccccaaaccccaaaaaaaccaaaccccccccaaacccccccccccccccaaaaaaaacaaaaaaaaaaaaaa
 abaaaccccccccccccccaaaaaaccccccccccccccaaacccccccccccccccaaaaaaaccaaaaaaccaacccaccaaaaccaaaaaaaccccccccaaccccccccccccccccccaaacccccccccccccccaaa
 abaaccccccccccccccaaaaaaacccccccccccaaaaaaaaccccccccccccccaaaaaaaaaaaaaacaaaccccccaaaaaccaaaaaaccccccaaaaccccccccccccccccccaaaccccccccccccaaaaaa
 abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccccaaaaaacaaaaaaaaaccccaaaaaacccccccccccccccccccccccccccccccaaaaaa"
-, ExpectedResult = 1)]
+, ExpectedResult = 1, TestName = "Main input")]
     public int Part1(string inputStr)
     {
         var input = inputStr.Split(Environment.NewLine);
 
-        var startX = -1;
-        var startY = -1;
-
         var height = input.Length;
         var width = input[0].Length;
+
+        var scores = new int[height, width];
 
         for (var y = 0; y < height; y++)
         {
@@ -65,28 +66,83 @@ abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccc
             {
                 if (input[y][x] == 'S')
                 {
-                    startX = x;
-                    startY = y;
+                    scores[y, x] = 1;
+                }
+            }
+        }
+
+        var step = 1;
+        while (!ScanAll(input, scores, step++) && step < 1000)
+        {
+            
+        }
+
+        DumpMap(scores);
+        return step - 1;
+    }
+
+    private void DumpMap(int[,] scores)
+    {
+        var width = scores.GetLength(1);
+        var height = scores.GetLength(0);
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                Console.Write(scores[y, x] % 10);
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine();
+    }
+
+    private bool ScanAll(string[] input, int[,] scores, int steps)
+    {
+        var width = input[0].Length;
+        var height = input.Length;
+        
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                if (scores[y, x] == steps && scores[y, x] != 0)
+                {
+                    var altitude = input[y][x] /*switch
+                    {
+                        'S' => 'a',
+                        _ => (char)(input[y][x] + 1),
+                    }*/;
+
+                    var finished =
+                    //Up
+                    Bump(input, scores, x, y - 1, steps + 1, altitude) ||
+
+                    //Down
+                    Bump(input, scores, x, y + 1, steps + 1, altitude) ||
+
+                    //Left
+                    Bump(input, scores, x - 1, y, steps + 1, altitude) ||
+
+                    //Right
+                    Bump(input, scores, x + 1, y, steps + 1, altitude);
+
+                    if (finished) return true;
                 }
             }
         }
         
-        var scores = new int[height, width];
-        
-        return Step(input, scores, startX, startY, 0, 'a');
+        return false;
     }
 
-    private int Step(string[] input, int[,] scores, int x, int y, int steps, char prevSquare)
+    private bool Bump(string[] input, int[,] scores, int x, int y, int steps, char prevSquare)
     {
-        //Console.WriteLine($"Visiting square ({x}, {y})");
-
         var width = input[0].Length;
         var height = input.Length;
 
         if (x < 0 || x >= width || y < 0 || y >= height)
         {
             // Array out of bounds
-            return int.MaxValue;
+            return false;
         }
 
         var thisSquare = input[y][x];
@@ -95,43 +151,28 @@ abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccc
         if (char.IsLower(thisSquare) && char.IsLower(prevSquare) && thisSquare > prevSquare + 1)
         {
             // Too steep
-            return int.MaxValue;
+            return false;
         }
 
-        if (thisSquare == 'E' && prevSquare < 'y')
+        if (thisSquare == 'E' && prevSquare < 'z')
         {
             // Too steep
-            return int.MaxValue;
+            return false;
         }
 
         if (thisSquare == 'E')
         {
             // We've finished!
-            return steps;
+            return true;
         }
 
         if (thisScore < steps && thisScore > 0)
         {
             // Already been here by a shorter route
-            return int.MaxValue;
+            return false;
         }
 
         scores[y, x] = steps;
-
-        var result = int.MaxValue;
-
-        //Up
-        result = Math.Min(result, Step(input, scores, x, y - 1, steps + 1, thisSquare));
-
-        //Down
-        result = Math.Min(result, Step(input, scores, x, y + 1, steps + 1, thisSquare));
-
-        //Left
-        result = Math.Min(result, Step(input, scores, x - 1, y, steps + 1, thisSquare));
-
-        //Right
-        result = Math.Min(result, Step(input, scores, x + 1, y, steps + 1, thisSquare));
-
-        return result;
+        return false;
     }
 }
