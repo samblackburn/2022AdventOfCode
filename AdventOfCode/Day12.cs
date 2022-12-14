@@ -78,40 +78,38 @@ abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccc
             
         }
 
-        DumpMap(scores);
+        //DumpMap(scores);
         return step - 1;
     }
     
-    [TestCase(ExampleInput, ExpectedResult = 31, TestName = "Example input")]
-    [TestCase(MainInput, ExpectedResult = 423, TestName = "Main input")]
+    [TestCase(ExampleInput, ExpectedResult = 28, TestName = "Example input")]
+    [TestCase(MainInput, ExpectedResult = 416, TestName = "Main input")]
     public int Part2(string inputStr)
     {
-        var input = inputStr.Split(Environment.NewLine);
-
-        var height = input.Length;
+        var input = inputStr.Replace('S', 'a').Split(Environment.NewLine);
+        var result = int.MaxValue;
+        
         var width = input[0].Length;
-
-        var scores = new int[height, width];
-
+        var height = input.Length;
         for (var y = 0; y < height; y++)
         {
-            for (var x = 0; x < width; x++)
+            //for (var x = 0; x < width; x++)
+            var x = 0;
             {
-                if (input[y][x] == 'S')
-                {
-                    scores[y, x] = 1;
-                }
+                var originalLine = input[y];
+                var line = originalLine.ToArray();
+                line[x] = 'S';
+                input[y] = new string(line);
+
+                var steps = Part1(string.Join(Environment.NewLine, input));
+                if (steps < result) result = steps;
+                Console.WriteLine(steps);
+                
+                input[y] = originalLine;
             }
         }
 
-        var step = 1;
-        while (!ScanAll(input, scores, step++) && step < 1000)
-        {
-            
-        }
-
-        DumpMap(scores);
-        return step - 1;
+        return result;
     }
 
     private void DumpMap(int[,] scores)
@@ -140,11 +138,7 @@ abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccc
             {
                 if (scores[y, x] == steps && scores[y, x] != 0)
                 {
-                    var altitude = input[y][x] /*switch
-                    {
-                        'S' => 'a',
-                        _ => (char)(input[y][x] + 1),
-                    }*/;
+                    var altitude = input[y][x];
 
                     var finished =
                     //Up
