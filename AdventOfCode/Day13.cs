@@ -36,62 +36,101 @@ public class Day13
         input = input ?? File.ReadAllText("Day13Input.txt");
         var result = input.Split(Environment.NewLine)
             .Chunk(3)
-            .Select(IsInCorrectOrder)
+            .Select(new PacketComparer().IsInCorrectOrder)
             .ToList();
         foreach (var line in result) Console.WriteLine(line);
-        return result.Select((order, index) => order == Order.Correct ? index + 1 : 0).Sum();
+        return result.Select((order, index) => order == PacketComparer.Order.Correct ? index + 1 : 0).Sum();
     }
-
-    [TestCase("[1,1,3,1,1]", "[1,1,5,1,1]", ExpectedResult = Order.Correct)]
-    [TestCase("[[1],[2,3,4]]", "[[1],4]", ExpectedResult = Order.Correct)]
-    [TestCase("1", "1", ExpectedResult = Order.Equal)]
-    [TestCase("[]", "3", ExpectedResult = Order.Correct)]
-    [TestCase("[[[]]]", "[[]]", ExpectedResult = Order.Incorrect)]
-    public Order IsInCorrectOrder(params string[] threeLines)
+    
+    [TestCase(ExampleInput, ExpectedResult = 140, TestName = "Example input")]
+    [TestCase(null, ExpectedResult = 22932, TestName = "Puzzle Input")]
+    public int Part2(string? input)
     {
-        var left = JsonConvert.DeserializeObject(threeLines[0]);
-        var right = JsonConvert.DeserializeObject(threeLines[1]);
-        //Assert.IsEmpty(threeLines[2]);
+        var headerPackets = new HashSet<string> {"[[2]]", "[[6]]"};
+        input ??= File.ReadAllText("Day13Input.txt");
+        var reordered = input
+            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+            .Concat(headerPackets)
+            .ToList();
+        reordered.Sort(new PacketComparer());
 
-        return CompareObjects((left, right));
-    }
-
-    private Order CompareLists(JArray left, JArray right)
-    {
-        //return left.Zip(right).Select(CompareObjects).FirstOrDefault(x => x != Order.Equal);
-        for (var i = 0; i < Math.Min(left.Count, right.Count); i++)
+        int lineNumber = 0;
+        int result = 1;
+        foreach (var line in reordered)
         {
-            var order = CompareObjects((left[i], right[i]));
-            if (order != Order.Equal) return order;
+            lineNumber++;
+            Console.WriteLine(line);
+            if (headerPackets.Contains(line))
+            {
+                Console.WriteLine(lineNumber);
+                result *= lineNumber;
+            }
         }
 
-        // Shorter list should come first
-        return CompareInts(left.Count, right.Count);
+        return result;
     }
 
-    private Order CompareObjects((object, object) pair) => pair switch
+    private class PacketComparer : IComparer<string>
     {
-        (JArray left, JArray right) => CompareLists(left, right),
-        (JValue left, JValue right) => CompareInts((long)left, (long)right),
-        (long left, long right) => CompareInts(left, right),
-        (JArray left, JValue right) => CompareLists(left, new JArray {(int)right}),
-        (JArray left, long right) => CompareLists(left, new JArray {(int)right}),
-        (JValue left, JArray right) => CompareLists(new JArray {(int)left}, right),
-        (long left, JArray right) => CompareLists(new JArray {(int)left}, right),
-        _ => throw new ArgumentException($"{pair.Item1.GetType()}, {pair.Item2.GetType()}")
-    };
+        public int Compare(string? x, string? y)
+        {
+            var left = JsonConvert.DeserializeObject(x);
+            var right = JsonConvert.DeserializeObject(y);
 
-    private Order CompareInts(long left, long right)
-    {
-        if (left < right) return Order.Correct;
-        if (left == right) return Order.Equal;
-        return Order.Incorrect;
-    }
+            return (int) CompareObjects((left, right));
+        }
 
-    public enum Order
-    {
-        Correct = -1,
-        Equal = 0,
-        Incorrect = 1,
+        [TestCase("[1,1,3,1,1]", "[1,1,5,1,1]", ExpectedResult = Order.Correct)]
+        [TestCase("[[1],[2,3,4]]", "[[1],4]", ExpectedResult = Order.Correct)]
+        [TestCase("1", "1", ExpectedResult = Order.Equal)]
+        [TestCase("[]", "3", ExpectedResult = Order.Correct)]
+        [TestCase("[[[]]]", "[[]]", ExpectedResult = Order.Incorrect)]
+        public Order IsInCorrectOrder(params string[] threeLines)
+        {
+            var left = JsonConvert.DeserializeObject(threeLines[0]);
+            var right = JsonConvert.DeserializeObject(threeLines[1]);
+            //Assert.IsEmpty(threeLines[2]);
+
+            return CompareObjects((left, right));
+        }
+
+        private Order CompareLists(JArray left, JArray right)
+        {
+            //return left.Zip(right).Select(CompareObjects).FirstOrDefault(x => x != Order.Equal);
+            for (var i = 0; i < Math.Min(left.Count, right.Count); i++)
+            {
+                var order = CompareObjects((left[i], right[i]));
+                if (order != Order.Equal) return order;
+            }
+
+            // Shorter list should come first
+            return CompareInts(left.Count, right.Count);
+        }
+
+        private Order CompareObjects((object, object) pair) => pair switch
+        {
+            (JArray left, JArray right) => CompareLists(left, right),
+            (JValue left, JValue right) => CompareInts((long) left, (long) right),
+            (long left, long right) => CompareInts(left, right),
+            (JArray left, JValue right) => CompareLists(left, new JArray {(int) right}),
+            (JArray left, long right) => CompareLists(left, new JArray {(int) right}),
+            (JValue left, JArray right) => CompareLists(new JArray {(int) left}, right),
+            (long left, JArray right) => CompareLists(new JArray {(int) left}, right),
+            _ => throw new ArgumentException($"{pair.Item1.GetType()}, {pair.Item2.GetType()}")
+        };
+
+        private Order CompareInts(long left, long right)
+        {
+            if (left < right) return Order.Correct;
+            if (left == right) return Order.Equal;
+            return Order.Incorrect;
+        }
+
+        public enum Order
+        {
+            Correct = -1,
+            Equal = 0,
+            Incorrect = 1,
+        }
     }
 }
