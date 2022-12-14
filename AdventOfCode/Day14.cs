@@ -10,6 +10,23 @@ public class Day14
     [TestCase(null, ExpectedResult = 1068, TestName = "Challenge input")]
     public int Part1(string? inputStr)
     {
+        var grid = ConstructGrid(inputStr, out var translatedSource);
+
+        bool itFellOut;
+        var grains = 0;
+        do
+        {
+            itFellOut = DropOneGrain(grid, translatedSource);
+            ++grains;
+        } while (!itFellOut);
+        
+        Draw(grid);
+        Console.WriteLine("Total grains: " + (grains - 1));
+        return grains - 1;
+    }
+
+    private Cell[,] ConstructGrid(string? inputStr, out Point translatedSource)
+    {
         var input = (inputStr ?? File.ReadAllText("Day14Input.txt"))
             .Split(Environment.NewLine)
             .Select(line => line
@@ -29,6 +46,8 @@ public class Day14
         var right = input.Max(wiggle => wiggle.Max(c => c.X)) + 1;
         var height = bottom - top + 1;
         var width = right - left + 1;
+        
+        translatedSource = new Point(source.X - left, source.Y - top);
 
         var grid = new Cell[width, height];
         grid[source.X - left, source.Y - top] = Cell.Source;
@@ -50,17 +69,7 @@ public class Day14
             }
         }
 
-        bool itFellOut;
-        var grains = 0;
-        do
-        {
-            itFellOut = DropOneGrain(grid, new Point(source.X - left, source.Y - top));
-            ++grains;
-        } while (!itFellOut);
-        
-        Draw(grid);
-        Console.WriteLine("Total grains: " + (grains - 1));
-        return grains - 1;
+        return grid;
     }
 
     private bool DropOneGrain(Cell[,] grid, Point source)
