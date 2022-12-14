@@ -2,14 +2,13 @@
 
 public class Day12
 {
-    [TestCase(
-@"Sabqponm
+    private const string ExampleInput = @"Sabqponm
 abcryxxl
 accszExk
 acctuvwj
-abdefghi", ExpectedResult = 31, TestName = "Example input")]
-    [TestCase(
-@"abaaacccccccccaaaaaaccccccccccccccccaacccccccccccaacaaaaaaaaaaaaaaaaaccaaaaacccaaaaccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaa
+abdefghi";
+
+    private const string MainInput = @"abaaacccccccccaaaaaaccccccccccccccccaacccccccccccaacaaaaaaaaaaaaaaaaaccaaaaacccaaaaccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaa
 abaaacccccccccaaaaaacccccccccccccccaaaaccccccccccaaaaaaaacaaaaaaaaaaaccaaaaaaccaaaacccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaaa
 abaaaccccccccccaaaaacccccccccccccccaaaacccccccccccaaaaacccaaaaaaaaaacccaaaaaacccaaccccccccccccccaaaaacccccccccccccccccccccccccccccccccccccaaaaaa
 abccccaaccccccaaaaacccccccccaaaaaccaaaaccccccccccccaaaaacaaaaaaaaacccccaaaaaccccccccccccccccccccaaaaacccccccccccccccccaaaccccaaaccccccccccaaacaa
@@ -49,9 +48,43 @@ abaccccccccaaaaccccaaacaaacaaaaaaccccccccccaacaaccccccccaaaacaaaacaaacaaaaaaaaaa
 abaaacccccccaaaccccaaaaaaaccaaaccccccccaaacccccccccccccccaaaaaaaacaaaaaaaaaaaaaaacacaaccaaacaaacccaacccccccccccccccccaacccaaaacccccccccccccccaaa
 abaaaccccccccccccccaaaaaaccccccccccccccaaacccccccccccccccaaaaaaaccaaaaaaccaacccaccaaaaccaaaaaaaccccccccaaccccccccccccccccccaaacccccccccccccccaaa
 abaaccccccccccccccaaaaaaacccccccccccaaaaaaaaccccccccccccccaaaaaaaaaaaaaacaaaccccccaaaaaccaaaaaaccccccaaaaccccccccccccccccccaaaccccccccccccaaaaaa
-abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccccaaaaaacaaaaaaaaaccccaaaaaacccccccccccccccccccccccccccccccaaaaaa"
-, ExpectedResult = 1, TestName = "Main input")]
+abaaaccccccccccccaaaaaaaaaacccccccccaaaaaaaacccccccccccaaaaaaaaaaaaaaaaaaacccccccaaaaaacaaaaaaaaaccccaaaaaacccccccccccccccccccccccccccccccaaaaaa";
+
+    [TestCase(ExampleInput, ExpectedResult = 31, TestName = "Example input")]
+    [TestCase(MainInput, ExpectedResult = 423, TestName = "Main input")]
     public int Part1(string inputStr)
+    {
+        var input = inputStr.Split(Environment.NewLine);
+
+        var height = input.Length;
+        var width = input[0].Length;
+
+        var scores = new int[height, width];
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                if (input[y][x] == 'S')
+                {
+                    scores[y, x] = 1;
+                }
+            }
+        }
+
+        var step = 1;
+        while (!ScanAll(input, scores, step++) && step < 1000)
+        {
+            
+        }
+
+        DumpMap(scores);
+        return step - 1;
+    }
+    
+    [TestCase(ExampleInput, ExpectedResult = 31, TestName = "Example input")]
+    [TestCase(MainInput, ExpectedResult = 423, TestName = "Main input")]
+    public int Part2(string inputStr)
     {
         var input = inputStr.Split(Environment.NewLine);
 
